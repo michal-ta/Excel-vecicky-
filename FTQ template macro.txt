@@ -1,0 +1,110 @@
+Sub Execute()
+Dim Machines() As String 'define machines array
+Dim MachineNumber As Integer
+
+Dim i, j As Integer
+
+
+Sheets("Cover").Activate
+
+For i = 3 To 17 'get number of machines
+    If Sheets("Cover").Cells(i, 1).Value = "" Then
+        Exit For
+    End If
+Next
+MachineNumber = i - 3
+ReDim Machines(MachineNumber - 1) ' because starts with 0
+For i = 3 To 17 'setup unique machine name
+    If Sheets("Cover").Cells(i, 1).Value = "" Then
+        Exit For
+    Else
+        Machines(i - 3) = Sheets("Cover").Cells(i, 1).Value
+    End If
+Next
+
+Dim R, G, B As Integer
+
+'****** setup background colors for bench
+For i = 3 To MachineNumber + 2
+    Sheets("Cover").Cells(i, 1).Interior.Color = RGB(Sheets("SourceData").Cells(i, 2).Value, Sheets("SourceData").Cells(i, 3).Value, Sheets("SourceData").Cells(i, 4).Value)
+    If Sheets("SourceData").Cells(i, 5).Value = 0 Then
+        Sheets("Cover").Cells(i, 1).Font.Color = RGB(0, 0, 0)
+    Else
+        Sheets("Cover").Cells(i, 1).Font.Color = RGB(255, 255, 255)
+    End If
+Next
+
+
+'****** Failcake Source data
+    Sheets("Cover").ChartObjects("FailCake").Chart.SetSourceData Source:=Sheets("Cover").Range("A2:A" + CStr(MachineNumber + 2) + ",C2:C" + CStr(MachineNumber + 2))
+' Failcake Colors
+    For i = 0 To (MachineNumber - 1)
+        R = Sheets("SourceData").Cells(i + 3, 2).Value
+        G = Sheets("SourceData").Cells(i + 3, 3).Value
+        B = Sheets("SourceData").Cells(i + 3, 4).Value
+        Sheets("Cover").ChartObjects("FailCake").Chart.SeriesCollection(1).Points(i + 1).Format.Fill.ForeColor.RGB = RGB(R, G, B)
+    Next
+
+Dim LastRow, LastColumn As Integer
+
+'****** RealFails source data
+    LastRow = Sheets("RealFails").Cells(Sheets("RealFails").Rows.Count, "A").End(xlUp).Row
+    LastColumn = Sheets("RealFails").Cells(1, Sheets("RealFails").Columns.Count).End(xlToLeft).Column
+    If LastRow > 1 And LastColumn > 1 Then
+    Sheets("Cover").ChartObjects("RealFail").Chart.SetSourceData Source:=Sheets("RealFails").Range(Sheets("RealFails").Cells(1, 1), Sheets("RealFails").Cells(LastRow, LastColumn))
+    Sheets("Cover").ChartObjects("RealFail").Chart.PlotBy = xlRows
+    For i = 2 To LastRow
+        For j = 0 To (MachineNumber - 1) 'Tricky Setup same colors for same benches
+            If Machines(j) = Sheets("RealFails").Cells(i, 1).Value Then
+                R = Sheets("SourceData").Cells(j + 3, 2).Value
+                G = Sheets("SourceData").Cells(j + 3, 3).Value
+                B = Sheets("SourceData").Cells(j + 3, 4).Value
+                Sheets("Cover").ChartObjects("RealFail").Chart.SeriesCollection(i - 1).Format.Fill.ForeColor.RGB = RGB(R, G, B)
+                Exit For
+            End If
+        Next
+    Next
+    End If
+    
+'****** PseudoFails source data
+    LastRow = Sheets("PseudoFails").Cells(Sheets("PseudoFails").Rows.Count, "A").End(xlUp).Row
+    LastColumn = Sheets("PseudoFails").Cells(1, Sheets("PseudoFails").Columns.Count).End(xlToLeft).Column
+    If LastRow > 1 And LastColumn > 1 Then
+    Sheets("Cover").ChartObjects("PesudoFail").Chart.SetSourceData Source:=Sheets("PseudoFails").Range(Sheets("PseudoFails").Cells(1, 1), Sheets("PseudoFails").Cells(LastRow, LastColumn))
+    Sheets("Cover").ChartObjects("PesudoFail").Chart.PlotBy = xlRows
+    For i = 2 To LastRow
+        For j = 0 To (MachineNumber - 1) 'Tricky Setup same colors for same benches
+            If Machines(j) = Sheets("PseudoFails").Cells(i, 1).Value Then
+                R = Sheets("SourceData").Cells(j + 3, 2).Value
+                G = Sheets("SourceData").Cells(j + 3, 3).Value
+                B = Sheets("SourceData").Cells(j + 3, 4).Value
+                Sheets("Cover").ChartObjects("PesudoFail").Chart.SeriesCollection(i - 1).Format.Fill.ForeColor.RGB = RGB(R, G, B)
+                Exit For
+            End If
+        Next
+    Next
+    End If
+    
+    
+    
+    '****** PseudoFails source data
+    LastRow = Sheets("AllFails").Cells(Sheets("AllFails").Rows.Count, "A").End(xlUp).Row
+    LastColumn = Sheets("AllFails").Cells(1, Sheets("AllFails").Columns.Count).End(xlToLeft).Column
+    If LastRow > 1 And LastColumn > 1 Then
+    Sheets("Cover").ChartObjects("AllFails").Chart.SetSourceData Source:=Sheets("AllFails").Range(Sheets("AllFails").Cells(1, 1), Sheets("AllFails").Cells(LastRow, LastColumn))
+    Sheets("Cover").ChartObjects("AllFails").Chart.PlotBy = xlRows
+    For i = 2 To LastRow
+        For j = 0 To (MachineNumber - 1) 'Tricky Setup same colors for same benches
+            If Machines(j) = Sheets("AllFails").Cells(i, 1).Value Then
+                R = Sheets("SourceData").Cells(j + 3, 2).Value
+                G = Sheets("SourceData").Cells(j + 3, 3).Value
+                B = Sheets("SourceData").Cells(j + 3, 4).Value
+                Sheets("Cover").ChartObjects("AllFails").Chart.SeriesCollection(i - 1).Format.Fill.ForeColor.RGB = RGB(R, G, B)
+                Exit For
+            End If
+        Next
+    Next
+    End If
+
+End Sub
+

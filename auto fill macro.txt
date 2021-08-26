@@ -1,0 +1,17 @@
+Sub Macro2()
+'
+' Macro2 Macro
+'
+    Do
+    Selection.End(xlDown).Select
+    ActiveCell.Select
+    Selection.AutoFill Destination:=Range(ActiveCell, ActiveCell.End(xlDown).Offset(-1, 0))
+    Range(ActiveCell, ActiveCell.End(xlDown)).Select
+    
+    Loop
+    
+End Sub
+ 
+
+
+
